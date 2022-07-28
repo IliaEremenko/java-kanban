@@ -42,18 +42,18 @@ public class EpicTask extends Task {
     }
 
     public void checkStatus() {
-        int changedLevel=3;
-        this.status="NEW";
+        int changedLevel = 3;
+        this.status = "NEW";
         for (SubTask subTask : subTasks) {
             if (subTask.status.equals("NEW")) {
                 changedLevel = 1;
                 this.status = subTask.status;
             }
-            if (subTask.status.equals("IN_PROGRESS") || changedLevel>1) {
+            if (subTask.status.equals("IN_PROGRESS") || changedLevel > 1) {
                 changedLevel = 2;
                 this.status = subTask.status;
             }
-            if (subTask.status.equals("DONE") || changedLevel>2) {
+            if (subTask.status.equals("DONE") || changedLevel > 2) {
                 this.status = subTask.status;
             }
 

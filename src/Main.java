@@ -7,7 +7,7 @@ public class Main {
         testRun(taskManager); // <------------------------------------------------------------Автоматическое создание
         //---------------------------------------------------------------------------задач по параметрам, см конец Main
         loop:
-        while(true){
+        while (true) {
             printMenu();
             Scanner scanner = new Scanner(System.in);
             int command = scanner.nextInt();
@@ -35,11 +35,11 @@ public class Main {
                     break;
                 case (7):
                     break loop;
-                }
             }
+        }
     }
 
-    public static void printMenu(){
+    public static void printMenu() {
         System.out.println("1 - получить список всех задач");
         System.out.println("2 - удалить все задачи");
         System.out.println("3 - получить задачу по имени");
@@ -48,13 +48,14 @@ public class Main {
         System.out.println("6 - удалить по имени");
         System.out.println("7 - выход");
     }
-    public static void testRun(TaskManager taskManager){
+
+    public static void testRun(TaskManager taskManager) {
         taskManager.generateEpicTaskForTest("111");  //создание эпик задачи для тестов с именем 111
         taskManager.generateEpicTaskForTest("222");
-        taskManager.generateSubTaskForTest("111","111"); //создание подзадачи для тестов с именем 111 у эпик задачи 111
-        taskManager.generateSubTaskForTest("333","111");
-        taskManager.generateSubTaskForTest("444","111");
-        taskManager.generateSubTaskForTest("111","222");
+        taskManager.generateSubTaskForTest("111", "111"); //создание подзадачи для тестов с именем 111 у эпик задачи 111
+        taskManager.generateSubTaskForTest("333", "111");
+        taskManager.generateSubTaskForTest("444", "111");
+        taskManager.generateSubTaskForTest("111", "222");
         taskManager.generateTaskForTest("111"); //создание обычных задач
         taskManager.generateTaskForTest("222");
     }

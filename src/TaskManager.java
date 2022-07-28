@@ -15,14 +15,13 @@ public class TaskManager {
         epicTasks = new HashMap<>();
     }
 
-    public void checkStatus(){
-        for(EpicTask epicTask : epicTasks.values()){
+    public void checkStatus() {
+        for (EpicTask epicTask : epicTasks.values()) {
             epicTask.checkStatus();
         }
     }
 
-
-    public boolean findBy(String name){
+    public boolean findBy(String name) {
         boolean hasBeenFound = false;
         boolean hasBeenFound2 = false;
         System.out.println("В обычных задачах найдено:");
@@ -33,9 +32,9 @@ public class TaskManager {
                 hasBeenFound2 = true;
             }
         }
-        if(!hasBeenFound)
+        if (!hasBeenFound)
             System.out.println("Ничего");
-        hasBeenFound=false;
+        hasBeenFound = false;
         System.out.println("В крупных задачах найдено:");
         for (EpicTask epicTask : epicTasks.values()) {
             if (epicTask.getName().equals(name)) {
@@ -44,9 +43,9 @@ public class TaskManager {
                 hasBeenFound2 = true;
             }
         }
-        if(!hasBeenFound)
+        if (!hasBeenFound)
             System.out.println("Ничего");
-        hasBeenFound=false;
+        hasBeenFound = false;
         System.out.println("В подзадачах найдено:");
         for (EpicTask epicTask : epicTasks.values()) {
             for (SubTask subTask : epicTask.subTasks)
@@ -57,7 +56,7 @@ public class TaskManager {
                     hasBeenFound2 = true;
                 }
         }
-        if(!hasBeenFound)
+        if (!hasBeenFound)
             System.out.println("Ничего");
         return hasBeenFound2;
 
@@ -136,16 +135,16 @@ public class TaskManager {
         }
     }
 
-    public void deleteAllTasks(){
+    public void deleteAllTasks() {
         tasks.clear();
         for (EpicTask epicTask : epicTasks.values()) {
-                epicTask.subTasks.clear();
-            }
+            epicTask.subTasks.clear();
+        }
         epicTasks.clear();
         System.out.println("Успешно");
     }
 
-    public void addTask () {
+    public void addTask() {
         addOrUpdateTask(true);
     }
 
@@ -153,12 +152,12 @@ public class TaskManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите имя");
         String name = scanner.next();
-        if(findBy(name))
+        if (findBy(name))
             addOrUpdateTask(false);
         else System.out.println("Такой задачи не существует");
     }
 
-    private void addOrUpdateTask (boolean isNew) {
+    private void addOrUpdateTask(boolean isNew) {
         status = "NEW";
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите вид задачи:" +
@@ -168,14 +167,13 @@ public class TaskManager {
         type = scanner.nextInt();
         if (type == 3) {
             System.out.println("Существующие основные задачи: ");
-            for(EpicTask epicTask : epicTasks.values())
+            for (EpicTask epicTask : epicTasks.values())
                 System.out.println(epicTask.toStringShort());
             System.out.println("Введите имя основной задачи");
             parentName = scanner.next();
             System.out.println("Введите имя подзадачи");
 
-        }
-        else
+        } else
             System.out.println("Введите имя");
         name = scanner.next();
         scanner.nextLine();
@@ -200,11 +198,11 @@ public class TaskManager {
             } else if (type == 3) {
                 boolean isContains = false;
                 EpicTask epicTask = epicTasks.get(String.valueOf(parentName));
-                if(epicTask==null) {
+                if (epicTask == null) {
                     System.out.println("Такой основной задачи не существует");
                     return;
                 }
-                if(epicTask.getName().equals(parentName))
+                if (epicTask.getName().equals(parentName))
                     for (SubTask subTask : epicTask.subTasks)
                         if (subTask.name.equals(name)) {
                             isContains = true;
@@ -214,9 +212,9 @@ public class TaskManager {
                     System.out.println("Введите описание");
                     description = scanner.nextLine();
                     epicTasks.get(parentName).subTasks.add(new SubTask(name, description, parentName, getId(name,
-                            parentName),status));
+                            parentName), status));
 
-                }else
+                } else
                     System.out.println("Такая задача уже существует");
             }
         } else {
@@ -244,7 +242,7 @@ public class TaskManager {
             } else {
                 boolean isContains = false;
                 for (EpicTask epicTask : epicTasks.values())
-                    if(epicTask.getName().equals(parentName))
+                    if (epicTask.getName().equals(parentName))
                         for (SubTask subTask : epicTask.subTasks)
                             if (subTask.name.equals(name)) {
                                 isContains = true;
@@ -255,9 +253,9 @@ public class TaskManager {
                                         "2 - In progress " +
                                         "3 - Done");
                                 status = convertStatusType(scanner.nextInt());
-                                epicTasks.get(parentName).subTasks.get(epicTasks.get(parentName).subTasks.size()-1).
+                                epicTasks.get(parentName).subTasks.get(epicTasks.get(parentName).subTasks.size() - 1).
                                         setDescription(description);
-                                epicTasks.get(parentName).subTasks.get(epicTasks.get(parentName).subTasks.size()-1).
+                                epicTasks.get(parentName).subTasks.get(epicTasks.get(parentName).subTasks.size() - 1).
                                         setStatus(status);
                                 return;
                             }
@@ -269,23 +267,23 @@ public class TaskManager {
     }
 
     public void getAllTasks() {
-        boolean isEmpty=true;
+        boolean isEmpty = true;
         if (tasks.size() > 0) {
             System.out.println("Обычные задачи: ");
-            isEmpty=false;
+            isEmpty = false;
             for (Task task : tasks.values())
                 System.out.println(task.toString());
         }
         if (epicTasks.size() > 0) {
             System.out.println("Крупные задачи: ");
-            isEmpty=false;
-            System.out.println(epicTasks.toString()+"\n");
+            isEmpty = false;
+            System.out.println(epicTasks.toString() + "\n");
 
         }
         if (isEmpty) System.out.println("Задач нет");
     }
 
-    private int getIdForUsualTask(String name){
+    private int getIdForUsualTask(String name) {
         int hash = 17;
         if (name != null) {
             hash -= name.hashCode();
@@ -293,7 +291,7 @@ public class TaskManager {
         return hash;
     }
 
-    private int getId(String name){
+    private int getId(String name) {
         int hash = 17;
         if (name != null) {
             hash = name.hashCode();
@@ -301,20 +299,20 @@ public class TaskManager {
         return hash;
     }
 
-    private int getId(String name,String parentId){
+    private int getId(String name, String parentId) {
         int hash = 17;
         if (name != null) {
             hash = name.hashCode();
         }
-        hash*=31;
+        hash *= 31;
         if (parentId != null) {
             hash = hash + parentId.hashCode();
         }
         return hash;
     }
 
-    private String convertStatusType(int statusInput){
-        while(true) {
+    private String convertStatusType(int statusInput) {
+        while (true) {
             if (statusInput == 1)
                 return "NEW";
             if (statusInput == 2)
@@ -323,23 +321,23 @@ public class TaskManager {
                 return "DONE";
             System.out.println("Неправильный выбор");
             Scanner scanner = new Scanner(System.in);
-            statusInput=scanner.nextInt();
+            statusInput = scanner.nextInt();
         }
     }
 
     public void generateTaskForTest(String name) {
         type = 1;
         description = "test";
-        tasks.put(name, new Task(name, description, getIdForUsualTask(name),status));
+        tasks.put(name, new Task(name, description, getIdForUsualTask(name), status));
     }
 
-    public void generateSubTaskForTest(String name,String parentId) {
+    public void generateSubTaskForTest(String name, String parentId) {
         type = 3;
 
         description = "test";
 
-       if (epicTasks.size() > 0)
-            epicTasks.get(parentId).subTasks.add(new SubTask(name, description, parentId, getId(name, parentId),status));
+        if (epicTasks.size() > 0)
+            epicTasks.get(parentId).subTasks.add(new SubTask(name, description, parentId, getId(name, parentId), status));
     }
 
     public void generateEpicTaskForTest(String name) {

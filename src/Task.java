@@ -5,12 +5,14 @@ public class Task {
     String name;
     String description;
 
-    Task(){}
-    Task(String name, String description,int id,String status){
+    Task() {
+    }
+
+    Task(String name, String description, int id, String status) {
         this.id = id;
-        this.name=name;
-        this.description=description;
-        this.status=status;
+        this.name = name;
+        this.description = description;
+        this.status = status;
     }
 
     public void setStatus(String status) {
@@ -35,10 +37,11 @@ public class Task {
                 ", Статус = " + status +
                 ", Описание = " + description;
     }
+
     public String toStringId() {
         return "Задача :" + name +
                 ", Статус = " + status +
-                ", Описание = " + description+
+                ", Описание = " + description +
                 ", id = " + id;
     }
 }

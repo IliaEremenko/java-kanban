@@ -1,6 +1,7 @@
 public class SubTask extends Task {
     String parentName;
-    SubTask(String name, String description, String parentName, int id, String status){
+
+    SubTask(String name, String description, String parentName, int id, String status) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -19,7 +20,7 @@ public class SubTask extends Task {
     public String toStringId() {
         return "   Подзадача: " + name +
                 ", Статус = " + status +
-                ", Описание = " + description+
+                ", Описание = " + description +
                 ", id = " + id;
     }
 
