@@ -14,6 +14,38 @@ public class TaskManager {
         epicTasks = new HashMap<>();
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public void checkStatus() {
         for (EpicTask epicTask : epicTasks.values()) {
             epicTask.checkStatus();
@@ -127,29 +159,28 @@ public class TaskManager {
                 "1 - обычная задача, " +
                 "2 - крупная задача, " +
                 "3 - подзадача");
-        type = scanner.nextInt();
-        if (type == 3) {
+        setType(scanner.nextInt());
+        if (getType() == 3) {
             System.out.println("Существующие основные задачи: ");
             for (EpicTask epicTask : epicTasks.values())
                 System.out.println(epicTask.toStringShort());
             System.out.println("Введите имя основной задачи");
-            parentName = scanner.next();
+            setParentName(scanner.next());
             System.out.println("Введите имя подзадачи");
-
         } else
             System.out.println("Введите имя");
         name = scanner.next();
         scanner.nextLine();
         if(!isNew)
-            type+=3;
-        switch (type){
+            setType(getType()+3);
+        switch (getType()){
             case (1):
                 if (tasks.get(name) != null)
                     System.out.println("Такая задача уже существует");
                 else {
                     System.out.println("Введите описание");
-                    description = scanner.nextLine();
-                    tasks.put(name, new Task(name, description, getIdForUsualTask(name), status));
+                    setDescription(scanner.nextLine());
+                    tasks.put(name, new Task(name, getDescription(), getIdForUsualTask(name), getStatus()));
                 }
                 break;
             case(2):
@@ -158,18 +189,18 @@ public class TaskManager {
                 } else {
                     System.out.println("Введите описание");
 
-                    description = scanner.nextLine();
-                    epicTasks.put(name, new EpicTask(name, description, getId(name)));
+                    setDescription(scanner.nextLine());
+                    epicTasks.put(name, new EpicTask(name, getDescription(), getId(name)));
                 }
                 break;
             case(3):
                 boolean isContains = false;
-                EpicTask epicTask = epicTasks.get(String.valueOf(parentName));
+                EpicTask epicTask = epicTasks.get(String.valueOf(getParentName()));
                 if (epicTask == null) {
                     System.out.println("Такой основной задачи не существует");
                     return;
                 }
-                if (epicTask.getName().equals(parentName))
+                if (epicTask.getName().equals(getParentName()))
                     for (SubTask subTask : epicTask.getSubTasks())
                         if (subTask.getName().equals(name)) {
                             isContains = true;
@@ -177,9 +208,9 @@ public class TaskManager {
                         }
                 if (!isContains) {
                     System.out.println("Введите описание");
-                    description = scanner.nextLine();
-                    epicTasks.get(parentName).getSubTasks().add(new SubTask(name, description, parentName, getId(name,
-                            parentName), status));
+                    setDescription(scanner.nextLine());
+                    epicTasks.get(getParentName()).getSubTasks().add(new SubTask(name, getDescription(), getParentName(), getId(name,
+                            getParentName()), getStatus()));
 
                 } else
                     System.out.println("Такая задача уже существует");
@@ -189,13 +220,13 @@ public class TaskManager {
                     System.out.println("Такой задачи не существует");
                 } else {
                     System.out.println("Введите описание");
-                    description = scanner.nextLine();
+                    setDescription(scanner.nextLine());
                     System.out.println("Введите статус: " +
                             "1 - New " +
                             "2 - In progress " +
                             "3 - Done");
-                    status = convertStatusType(scanner.nextInt());
-                    tasks.put(name, new Task(name, description, getIdForUsualTask(name), status));
+                    setStatus(convertStatusType(scanner.nextInt()));
+                    tasks.put(name, new Task(name, getDescription(), getIdForUsualTask(name), getStatus()));
                 }
                 break;
             case(5):
@@ -203,28 +234,29 @@ public class TaskManager {
                     System.out.println("Такой задачи не существует");
                 } else {
                     System.out.println("Введите описание");
-                    description = scanner.nextLine();
-                    epicTasks.put(name, new EpicTask(name, description, getId(name)));
+                    setDescription(scanner.nextLine());
+                    epicTasks.put(name, new EpicTask(name, getDescription(), getId(name)));
                 }
                 break;
             case (6):
+                int i = -1;
                 for (EpicTask epicTask2 : epicTasks.values())
-                    if (epicTask2.getName().equals(parentName))
-                        for (SubTask subTask : epicTask2.getSubTasks())
+                    if (epicTask2.getName().equals(getParentName()))
+                        for (SubTask subTask : epicTask2.getSubTasks()) {
+                            i++;
                             if (subTask.getName().equals(name)) {
                                 System.out.println("Введите описание");
-                                description = scanner.nextLine();
+                                setDescription(scanner.nextLine());
                                 System.out.println("Введите статус: " +
                                         "1 - New " +
                                         "2 - In progress " +
                                         "3 - Done");
-                                status = convertStatusType(scanner.nextInt());
-                                epicTasks.get(parentName).getSubTasks().get(epicTasks.get(parentName).getSubTasks().size() - 1).
-                                        setDescription(description);
-                                epicTasks.get(parentName).getSubTasks().get(epicTasks.get(parentName).getSubTasks().size() - 1).
-                                        setStatus(status);
+                                setStatus(convertStatusType(scanner.nextInt()));
+                                epicTasks.get(getParentName()).getSubTasks().get(i).setDescription(getDescription());
+                                epicTasks.get(getParentName()).getSubTasks().get(i).setStatus(getStatus());
                                 return;
                             }
+                        }
                 System.out.println("Такой задачи не существует");
                 break;
             }
