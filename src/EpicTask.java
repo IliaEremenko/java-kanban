@@ -1,60 +1,61 @@
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
-    ArrayList<SubTask> subTasks;
-    int taskCount = 0;
+    private ArrayList<SubTask> subTasks;
 
     EpicTask(String name, String description, int id) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+        this.setId(id);
+        this.setName(name);
+        this.setDescription(description);
         subTasks = new ArrayList<>();
     }
 
     EpicTask(String name, String description, int id, String status) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
+        this.setId(id);
+        this.setName(name);
+        this.setDescription(description);
         subTasks = new ArrayList<>();
-        this.status = status;
+        this.setStatus(status);
     }
 
+    public ArrayList<SubTask> getSubTasks() {
+        return subTasks;
+    }
+
+    public void setSubTasks(ArrayList<SubTask> subTasks) {
+        this.subTasks = subTasks;
+    }
 
     @Override
     public String toString() {
-        return "Задача: " + name +
-                ", Статус = " + status +
-                ", Описание = " + description +
+        return "Задача: " + getName() +
+                ", Статус = " + getStatus() +
+                ", Описание = " + getDescription() +
+                ", id = " + getId() +
                 ", Подзадачи: " + "\n" + subTasks.toString();
     }
 
     public String toStringShort() {
-        return "Задача: " + name +
-                ", Статус = " + status +
-                ", Описание = " + description;
-    }
-
-    public String toStringShortId() {
-        return "Задача: " + name +
-                ", Статус = " + status +
-                ", Описание = " + description +
-                ", id = " + id;
+        return "Задача: " + getName() +
+                ", Статус = " + getStatus() +
+                ", Описание = " + getDescription() +
+                ", id = " + getId();
     }
 
     public void checkStatus() {
         int changedLevel = 3;
-        this.status = "NEW";
+        this.setStatus("NEW");
         for (SubTask subTask : subTasks) {
-            if (subTask.status.equals("NEW")) {
+            if (subTask.getStatus().equals("NEW")) {
                 changedLevel = 1;
-                this.status = subTask.status;
+                this.setStatus(subTask.getStatus());
             }
-            if (subTask.status.equals("IN_PROGRESS") || changedLevel > 1) {
+            if (subTask.getStatus().equals("IN_PROGRESS") && changedLevel > 1) {
                 changedLevel = 2;
-                this.status = subTask.status;
+                this.setStatus(subTask.getStatus());
             }
-            if (subTask.status.equals("DONE") || changedLevel > 2) {
-                this.status = subTask.status;
+            if (subTask.getStatus().equals("DONE") && changedLevel > 2) {
+                this.setStatus(subTask.getStatus());
             }
 
         }

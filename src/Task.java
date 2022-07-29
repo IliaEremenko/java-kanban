@@ -1,9 +1,9 @@
 
 public class Task {
-    int id;
-    String status;
-    String name;
-    String description;
+    private int id;
+    private String status;
+    private String name;
+    private String description;
 
     Task() {
     }
@@ -31,14 +31,24 @@ public class Task {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "Задача :" + name +
-                ", Статус = " + status +
-                ", Описание = " + description;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String toStringId() {
+    public String getStatus() {
+        return status;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String toString() {
         return "Задача :" + name +
                 ", Статус = " + status +
                 ", Описание = " + description +
