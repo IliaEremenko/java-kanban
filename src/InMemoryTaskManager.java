@@ -188,13 +188,6 @@ public class InMemoryTaskManager implements TaskManager  {
                     i++;
                 }
             }
-            /*ArrayList<Integer> memory =  inMemoryHistoryManager.getHistory();
-            for(int i = 0; i<10;i++){
-                if(memory.get(i)==id) {
-                    memory.remove(i);
-                    break;
-                }
-            }*/
         }
     }
 
