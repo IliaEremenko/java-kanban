@@ -1,5 +1,5 @@
 
-public class Task {
+public class Task extends InMemoryTaskManager {
     private int id;
     private String status;
     private String name;

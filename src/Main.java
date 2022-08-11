@@ -1,39 +1,52 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
-        testRun(taskManager); // <------------------------------------------------------------Автоматическое создание
+        InMemoryTaskManager inMemoryTaskManager = Managers.getDefault(1);
+        testRun(inMemoryTaskManager); // <------------------------------------------------------Автоматическое создание
         //---------------------------------------------------------------------------задач по параметрам, см конец Main
         loop:
         while (true) {
             printMenu();
             Scanner scanner = new Scanner(System.in);
             int command = scanner.nextInt();
-            taskManager.checkStatus();
+            inMemoryTaskManager.checkStatus();
             switch (command) {
                 case (1):
-                    taskManager.getAllTasks();
+                    inMemoryTaskManager.getAllTasks();
                     break;
                 case (2):
-                    taskManager.deleteAllTasks();
+                    inMemoryTaskManager.deleteAllTasks();
                     break;
                 case (3):
                     System.out.println("Введите имя");
                     String name = scanner.next();
-                    taskManager.findBy(name);
+                    inMemoryTaskManager.findAll(name,true);
                     break;
                 case (4):
-                    taskManager.addTask();
+                    inMemoryTaskManager.addTask();
                     break;
                 case (5):
-                    taskManager.updateTask();
+                    inMemoryTaskManager.updateTask();
                     break;
                 case (6):
-                    taskManager.deleteByName();
+                    inMemoryTaskManager.deleteByName();
                     break;
                 case (7):
+                    ArrayList<Integer> memory = inMemoryTaskManager.getHistory();
+                    int i = 1;
+                    for (Integer task : memory) {
+                        System.out.print(i + ") ");
+                        if(!inMemoryTaskManager.findById(task))
+                            System.out.println("Удаленная задача");
+                        i++;
+                    }
+                    if(i==1)
+                        System.out.println("История пуста");
+                    break ;
+                case (8):
                     break loop;
             }
         }
@@ -46,10 +59,11 @@ public class Main {
         System.out.println("4 - Создать задачу");
         System.out.println("5 - Обновить задачу");
         System.out.println("6 - удалить по имени");
-        System.out.println("7 - выход");
+        System.out.println("7 - история просмотров");
+        System.out.println("8 - выход");
     }
 
-    public static void testRun(TaskManager taskManager) {
+    public static void testRun(InMemoryTaskManager taskManager) {
         taskManager.generateEpicTaskForTest("111");  //создание эпик задачи для тестов с именем 111
         taskManager.generateEpicTaskForTest("222");
         taskManager.generateSubTaskForTest("111", "111"); //создание подзадачи для тестов с именем 111 у эпик задачи 111
