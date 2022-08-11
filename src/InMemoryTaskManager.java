@@ -14,7 +14,7 @@ public class InMemoryTaskManager implements TaskManager  {
     InMemoryTaskManager() {
         tasks = new HashMap<>();
         epicTasks = new HashMap<>();
-        inMemoryHistoryManager = new InMemoryHistoryManager();
+        inMemoryHistoryManager = Managers.getDefaultHistory(1);
     }
 
     public String getDescription() {

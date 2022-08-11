@@ -10,7 +10,7 @@ public class InMemoryHistoryManager implements HistoryManager{
 
     @Override
     public void clearHistory() {
-        memory.clear();
+        memory.clear(); //очищаю историю вместе с удалением всех задач
     }
 
     @Override
