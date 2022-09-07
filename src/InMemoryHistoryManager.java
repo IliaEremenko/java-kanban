@@ -15,23 +15,23 @@ public class InMemoryHistoryManager implements HistoryManager{
         }
 
         public void linkLast(Task task) {
-            Node node = new Node(task, null);
+            Node newNode = new Node(task, null);
             if (size == 0) {
-                head = node;
+                head = newNode;
             } else if (size == 1) {
-                node = new Node(task, head);
-                last = node;
+                newNode = new Node(task, head);
+                last = newNode;
                 head.setNextLink(last);
             } else {
                 Node tempNode = last;
-                node = new Node(task, tempNode);
-                tempNode.setNextLink(node);
-                last = node;
+                newNode = new Node(task, tempNode);
+                tempNode.setNextLink(newNode);
+                last = newNode;
             }
-            if(taskHashMap.containsValue(node))
-                removeNode(taskHashMap.get(node.getTask().getId()));
+            if(taskHashMap.containsValue(newNode))
+                removeNode(taskHashMap.get(newNode.getTask().getId()));
             this.size++;
-            taskHashMap.put(node.getTask().getId(),node);
+            taskHashMap.put(newNode.getTask().getId(),newNode);
         }
 
         public void removeNode(Node node) {
@@ -99,8 +99,11 @@ public class InMemoryHistoryManager implements HistoryManager{
     @Override
     public ArrayList<Task> getHistory() {
         ArrayList<Task> arrayList = new ArrayList<>();
-        for (Node node : customLinkedList.getTaskHashMap().values())
+        Node node = customLinkedList.head;
+        for (int i = 0; i < customLinkedList.size; i++) {
             arrayList.add(node.getTask());
+            node = node.getNextLink();
+        }
         return arrayList;
     }
 }
