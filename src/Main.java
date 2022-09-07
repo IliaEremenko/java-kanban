@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
@@ -35,15 +36,14 @@ public class Main {
                     inMemoryTaskManager.deleteByName();
                     break;
                 case (7):
-                    ArrayList<Integer> memory = inMemoryTaskManager.getHistory();
-                    int i = 1;
-                    for (Integer task : memory) {
-                        System.out.print(i + ") ");
-                        if(!inMemoryTaskManager.findById(task))
-                            System.out.println("Удаленная задача");
-                        i++;
+                    ArrayList<Task> memory = inMemoryTaskManager.getHistory();
+                    int counter = 1;
+                    for (Task task : memory) {
+                        if(!inMemoryTaskManager.findById(task,counter))
+                            counter--;
+                        counter++;
                     }
-                    if(i==1)
+                    if(counter==1)
                         System.out.println("История пуста");
                     break ;
                 case (8):
@@ -64,13 +64,13 @@ public class Main {
     }
 
     public static void testRun(InMemoryTaskManager taskManager) {
-        taskManager.generateEpicTaskForTest("111");  //создание эпик задачи для тестов с именем 111
-        taskManager.generateEpicTaskForTest("222");
-        taskManager.generateSubTaskForTest("111", "111"); //создание подзадачи для тестов с именем 111 у эпик задачи 111
-        taskManager.generateSubTaskForTest("333", "111");
-        taskManager.generateSubTaskForTest("444", "111");
-        taskManager.generateSubTaskForTest("111", "222");
-        taskManager.generateTaskForTest("111"); //создание обычных задач
-        taskManager.generateTaskForTest("222");
+        taskManager.generateEpicTaskForTest("1");  //создание эпик задачи для тестов с именем 111
+        taskManager.generateEpicTaskForTest("2");
+        taskManager.generateSubTaskForTest("1", "1"); //создание подзадачи для тестов с именем 111 у эпик задачи 111
+        taskManager.generateSubTaskForTest("2", "1");
+        taskManager.generateSubTaskForTest("3", "1");
+        //taskManager.generateSubTaskForTest("1", "2");
+        taskManager.generateTaskForTest("1"); //создание обычных задач
+        taskManager.generateTaskForTest("2");
     }
 }

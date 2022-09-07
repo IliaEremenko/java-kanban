@@ -9,7 +9,8 @@ public class InMemoryTaskManager implements TaskManager  {
     private final HashMap<String, EpicTask> epicTasks;
     private final HashMap<String, Task> tasks;
     InMemoryHistoryManager inMemoryHistoryManager;
-
+    public static final String ANSI_BLUE_BACKGROUND = "\u001B[34m";
+    public static final String ANSI_RESET = "\u001B[0m";
 
     InMemoryTaskManager() {
         tasks = new HashMap<>();
@@ -57,28 +58,34 @@ public class InMemoryTaskManager implements TaskManager  {
     }
 
     @Override
-    public boolean findById(int id){
+    public boolean findById(Task task2,int counter){
         boolean hasBeenFound = false;
         for (Task task : tasks.values()) {
-            if (task.getId()==id) {
-                System.out.println(task);
+            if (task.getId()==task2.getId()) {
+                System.out.print(counter + ") ");
+                System.out.println(ANSI_BLUE_BACKGROUND + task + ANSI_RESET);
                 hasBeenFound = true;
             }
         }
         for (EpicTask epicTask : epicTasks.values()) {
-            if (epicTask.getId()==id) {
-                System.out.println(epicTask);
+            if (epicTask.getId()==task2.getId()) {
+                System.out.print(counter + ") ");
+                System.out.println(ANSI_BLUE_BACKGROUND + epicTask + ANSI_RESET);
                 hasBeenFound = true;
             }
         }
         for (EpicTask epicTask : epicTasks.values()) {
             for (SubTask subTask : epicTask.getSubTasks())
-                if (subTask.getId()==id) {
+                if (subTask.getId()==task2.getId()) {
+                    System.out.print(counter + ") ");
                     System.out.println(epicTask.toStringShort());
-                    System.out.println(subTask);
+                    subTask.setColor(ANSI_BLUE_BACKGROUND);
+                    System.out.println(subTask.toStringColor()+ANSI_RESET);
+                    subTask.setColor(ANSI_RESET);
                     hasBeenFound = true;
                 }
         }
+
         return hasBeenFound;
     }
 
@@ -109,7 +116,7 @@ public class InMemoryTaskManager implements TaskManager  {
                 System.out.println(task);
                 hasBeenFound = true;
                 if(isForHistory)
-                    inMemoryHistoryManager.saveHistory(task);
+                    inMemoryHistoryManager.add(task);
             }
         }
         if (!hasBeenFound)
@@ -126,7 +133,7 @@ public class InMemoryTaskManager implements TaskManager  {
                 System.out.println(epicTask);
                 hasBeenFound = true;
                 if(isForHistory)
-                    inMemoryHistoryManager.saveHistory(epicTask);
+                    inMemoryHistoryManager.add(epicTask);
             }
         }
         if (!hasBeenFound)
@@ -145,7 +152,7 @@ public class InMemoryTaskManager implements TaskManager  {
                     System.out.println(subTask);
                     hasBeenFound = true;
                     if(isForHistory)
-                        inMemoryHistoryManager.saveHistory(subTask);
+                        inMemoryHistoryManager.add(subTask);
                 }
         }
         if (!hasBeenFound)
@@ -197,7 +204,7 @@ public class InMemoryTaskManager implements TaskManager  {
         for (EpicTask epicTask : epicTasks.values()) {
             epicTask.getSubTasks().clear();
         }
-        inMemoryHistoryManager.clearHistory();
+        inMemoryHistoryManager.remove();
         epicTasks.clear();
         System.out.println("Успешно");
     }
@@ -249,7 +256,7 @@ public class InMemoryTaskManager implements TaskManager  {
                     setDescription(scanner.nextLine());
                     Task task = new Task(name, getDescription(), getIdForUsualTask(name), getStatus());
                     tasks.put(name, task);
-                    inMemoryHistoryManager.saveHistory(task);
+                    inMemoryHistoryManager.add(task);
                 }
                 break;
             case(2):
@@ -261,7 +268,7 @@ public class InMemoryTaskManager implements TaskManager  {
                     setDescription(scanner.nextLine());
                     EpicTask epicTask = new EpicTask(name, getDescription(), getIdForUsualTask(name), getStatus());
                     epicTasks.put(name, epicTask);
-                    inMemoryHistoryManager.saveHistory(epicTask);
+                    inMemoryHistoryManager.add(epicTask);
                 }
                 break;
             case(3):
@@ -283,7 +290,7 @@ public class InMemoryTaskManager implements TaskManager  {
                     SubTask subTask = new SubTask(name, getDescription(), getParentName(), getId(name,
                             getParentName()), getStatus());
                     epicTasks.get(getParentName()).getSubTasks().add(subTask);
-                    inMemoryHistoryManager.saveHistory(subTask);
+                    inMemoryHistoryManager.add(subTask);
 
                 } else
                     System.out.println("Такая задача уже существует");
@@ -301,7 +308,7 @@ public class InMemoryTaskManager implements TaskManager  {
                     setStatus(convertStatusType(scanner.nextInt()));
                     Task task = new Task(name, getDescription(), getIdForUsualTask(name), getStatus());
                     tasks.put(name, task);
-                    inMemoryHistoryManager.saveHistory(task);
+                    inMemoryHistoryManager.add(task);
                 }
                 break;
             case(5):
@@ -312,7 +319,7 @@ public class InMemoryTaskManager implements TaskManager  {
                     setDescription(scanner.nextLine());
                     EpicTask epicTask2 = new EpicTask(name, getDescription(), getIdForUsualTask(name), getStatus());
                     epicTasks.put(name, epicTask2);
-                    inMemoryHistoryManager.saveHistory(epicTask2);
+                    inMemoryHistoryManager.add(epicTask2);
                 }
                 break;
             case (6):
@@ -331,7 +338,7 @@ public class InMemoryTaskManager implements TaskManager  {
                                 setStatus(convertStatusType(scanner.nextInt()));
                                 epicTasks.get(getParentName()).getSubTasks().get(i).setDescription(getDescription());
                                 epicTasks.get(getParentName()).getSubTasks().get(i).setStatus(getStatus());
-                                inMemoryHistoryManager.saveHistory(epicTasks.get(getParentName()).getSubTasks().get(i));
+                                inMemoryHistoryManager.add(epicTasks.get(getParentName()).getSubTasks().get(i));
                                 return;
                             }
                         }
@@ -390,7 +397,7 @@ public class InMemoryTaskManager implements TaskManager  {
     }
 
     @Override
-    public ArrayList<Integer> getHistory() {
+    public ArrayList<Task> getHistory() {
         return inMemoryHistoryManager.getHistory();
     }
 

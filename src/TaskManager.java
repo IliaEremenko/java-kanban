@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface TaskManager {
 
     void checkStatus();
 
-    boolean findById(int id);
+    boolean findById(Task task, int counter);
 
     boolean findAll(String name,boolean isForHistory);
 
@@ -34,6 +35,6 @@ public interface TaskManager {
 
     String convertStatusType(int statusInput);
 
-    ArrayList<Integer> getHistory();
+    ArrayList<Task> getHistory();
 
 }

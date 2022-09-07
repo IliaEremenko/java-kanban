@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
@@ -28,15 +29,15 @@ public class EpicTask extends Task {
 
     @Override
     public String toString() {
-        return "Задача: " + getName() +
+        return "Большая задача: " + getName() +
                 ", Статус = " + getStatus() +
                 ", Описание = " + getDescription() +
                 ", id = " + getId() +
-                ", Подзадачи: " + "\n" + subTasks.toString();
+                ", Подзадачи: " + "\n" +subTasks.toString();
     }
 
     public String toStringShort() {
-        return "Задача: " + getName() +
+        return "Большая задача: " + getName() +
                 ", Статус = " + getStatus() +
                 ", Описание = " + getDescription() +
                 ", id = " + getId();

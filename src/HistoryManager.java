@@ -1,9 +1,10 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface HistoryManager {
-    void saveHistory(Task task);
+    void add(Task task);
 
-    void clearHistory();
+    void remove();
 
-    ArrayList<Integer> getHistory();
+    ArrayList<Task> getHistory();
 }
