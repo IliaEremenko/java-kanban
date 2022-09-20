@@ -1,7 +1,12 @@
+package HistoryManagers;
+
+import LinkedListNode.Node;
+import Tasks.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
     CustomLinkedList customLinkedList;
     public static class CustomLinkedList {
         private Node head;
@@ -82,7 +87,7 @@ public class InMemoryHistoryManager implements HistoryManager{
         }
     }
 
-    InMemoryHistoryManager(){
+    public InMemoryHistoryManager(){
         customLinkedList = new CustomLinkedList();
     }
 

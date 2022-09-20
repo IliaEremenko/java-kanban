@@ -1,3 +1,7 @@
+package TaskManagers;
+
+import Tasks.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,7 +29,7 @@ public interface TaskManager {
 
     void addOrUpdateTask(boolean isNew);
 
-    void getAllTasks();
+    ArrayList<String> getAllTasks(boolean isShortToString);
 
     int getIdForUsualTask(String name);
 

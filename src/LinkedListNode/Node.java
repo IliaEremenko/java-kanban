@@ -1,3 +1,7 @@
+package LinkedListNode;
+
+import Tasks.Task;
+
 public class Node {
     private final Task task;
     private Node nextLink;

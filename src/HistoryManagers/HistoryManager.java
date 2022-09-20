@@ -1,5 +1,8 @@
+package HistoryManagers;
+
+import Tasks.Task;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public interface HistoryManager {
     void add(Task task);

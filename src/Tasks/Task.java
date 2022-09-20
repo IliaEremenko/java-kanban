@@ -1,18 +1,24 @@
+package Tasks;
+
+import TaskManagers.InMemoryTaskManager;
 
 public class Task extends InMemoryTaskManager {
     private int id;
     private String status;
     private String name;
     private String description;
+    private String taskType;
 
     Task() {
+        super();
     }
 
-    Task(String name, String description, int id, String status) {
+    public Task(String name, String description, int id, String status) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
+        this.taskType = "task";
     }
 
     public void setStatus(String status) {
@@ -52,7 +58,24 @@ public class Task extends InMemoryTaskManager {
         return "Задача :" + name +
                 ", Статус = " + status +
                 ", Описание = " + description +
-                ", id = " + id;
+                ", id = " + id + "\n";
+    }
+
+    public String toStringCSV(){
+        return  getId() +
+                "," + getTaskType() +
+                "," + getName() +
+                "," + getStatus() +
+                "," + getDescription() +
+                ";\n";
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 }
 

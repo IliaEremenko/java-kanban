@@ -1,0 +1,10 @@
+id,type,name,status,description,epic
+-1060507,task,ЬЬЬ,NEW,description;
+-1032703,task,ААА,NEW,description;
+32016386,epicTask,АБВГ,NEW,description;
+32017967,subTask,3,NEW,description,32016386;
+1032753,epicTask,АБВ,NEW,description;
+1034272,subTask,1,NEW,description,1032753;
+1034303,subTask,2,NEW,description,1032753;
+1034334,subTask,3,NEW,description,1032753;
+

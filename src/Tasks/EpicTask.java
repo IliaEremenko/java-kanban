@@ -1,30 +1,55 @@
-import java.awt.*;
+package Tasks;
+
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
     private ArrayList<SubTask> subTasks;
 
-    EpicTask(String name, String description, int id) {
+    public EpicTask(String name, String description, int id) {
         this.setId(id);
         this.setName(name);
         this.setDescription(description);
+        this.setTaskType("epicTask");
         subTasks = new ArrayList<>();
     }
 
-    EpicTask(String name, String description, int id, String status) {
+    public EpicTask(String name, String description, int id, String status) {
         this.setId(id);
         this.setName(name);
         this.setDescription(description);
-        subTasks = new ArrayList<>();
         this.setStatus(status);
+        this.setTaskType("epicTask");
+        subTasks = new ArrayList<>();
     }
 
     public ArrayList<SubTask> getSubTasks() {
         return subTasks;
     }
 
-    public void setSubTasks(ArrayList<SubTask> subTasks) {
-        this.subTasks = subTasks;
+    public ArrayList<String> getSubTasksCSV() {
+        ArrayList<String> subTaskArrayList = new ArrayList<>();
+        for (SubTask subTask : subTasks)
+            subTaskArrayList.add(subTask.toStringCSV());
+        return subTaskArrayList;
+    }
+
+    public int getId() {
+        return super.getId();
+    }
+    @Override
+    public String toStringCSV() {
+        if (subTasks.size() != 0) {
+            return getId() +
+                    "," + getTaskType()+
+                    "," + getName() +
+                    "," + getStatus() +
+                    "," + getDescription() + ";\n" + getSubTasksCSV();
+        } else return getId() +
+                "," + getTaskType()+
+                "," + getName() +
+                "," + getStatus() +
+                "," + getDescription() +
+                ";";
     }
 
     @Override
@@ -33,7 +58,7 @@ public class EpicTask extends Task {
                 ", Статус = " + getStatus() +
                 ", Описание = " + getDescription() +
                 ", id = " + getId() +
-                ", Подзадачи: " + "\n" +subTasks.toString();
+                ", Подзадачи: " + "\n" + subTasks.toString();
     }
 
     public String toStringShort() {
@@ -61,4 +86,6 @@ public class EpicTask extends Task {
 
         }
     }
+
+
 }

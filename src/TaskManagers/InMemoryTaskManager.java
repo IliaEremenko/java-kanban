@@ -1,7 +1,16 @@
+package TaskManagers;
+
+import Enums.Statuses;
+import Tasks.Task;
+import Tasks.EpicTask;
+import Tasks.SubTask;
+import HistoryManagers.InMemoryHistoryManager;
+import ManagersCreator.Managers;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-public class InMemoryTaskManager implements TaskManager  {
+public class InMemoryTaskManager implements TaskManager {
     private String description;
     private String status = "NEW";
     private String parentName;
@@ -9,13 +18,11 @@ public class InMemoryTaskManager implements TaskManager  {
     private final HashMap<String, EpicTask> epicTasks;
     private final HashMap<String, Task> tasks;
     InMemoryHistoryManager inMemoryHistoryManager;
-    public static final String ANSI_BLUE_BACKGROUND = "\u001B[34m";
-    public static final String ANSI_RESET = "\u001B[0m";
 
-    InMemoryTaskManager() {
+    public InMemoryTaskManager() {
         tasks = new HashMap<>();
         epicTasks = new HashMap<>();
-        inMemoryHistoryManager = Managers.getDefaultHistory(1);
+        inMemoryHistoryManager = (InMemoryHistoryManager) Managers.getDefaultHistory(1);
     }
 
     public String getDescription() {
@@ -58,19 +65,19 @@ public class InMemoryTaskManager implements TaskManager  {
     }
 
     @Override
-    public boolean findById(Task task2,int counter){
+    public boolean findById(Task task2, int counter){
         boolean hasBeenFound = false;
         for (Task task : tasks.values()) {
             if (task.getId()==task2.getId()) {
                 System.out.print(counter + ") ");
-                System.out.println(ANSI_BLUE_BACKGROUND + task + ANSI_RESET);
+                System.out.println(task);
                 hasBeenFound = true;
             }
         }
         for (EpicTask epicTask : epicTasks.values()) {
             if (epicTask.getId()==task2.getId()) {
                 System.out.print(counter + ") ");
-                System.out.println(ANSI_BLUE_BACKGROUND + epicTask + ANSI_RESET);
+                System.out.println(epicTask);
                 hasBeenFound = true;
             }
         }
@@ -78,10 +85,8 @@ public class InMemoryTaskManager implements TaskManager  {
             for (SubTask subTask : epicTask.getSubTasks())
                 if (subTask.getId()==task2.getId()) {
                     System.out.print(counter + ") ");
-                    System.out.println(epicTask.toStringShort());
-                    subTask.setColor(ANSI_BLUE_BACKGROUND);
-                    System.out.println(subTask.toStringColor()+ANSI_RESET);
-                    subTask.setColor(ANSI_RESET);
+                    System.out.println(epicTask.toStringCSV());
+                    System.out.println(subTask);
                     hasBeenFound = true;
                 }
         }
@@ -237,7 +242,7 @@ public class InMemoryTaskManager implements TaskManager  {
         if (getType() == 3) {
             System.out.println("Существующие основные задачи: ");
             for (EpicTask epicTask : epicTasks.values())
-                System.out.println(epicTask.toStringShort());
+                System.out.println(epicTask.toStringCSV());
             System.out.println("Введите имя основной задачи");
             setParentName(scanner.next());
             System.out.println("Введите имя подзадачи");
@@ -287,7 +292,7 @@ public class InMemoryTaskManager implements TaskManager  {
                 if (!isContains) {
                     System.out.println("Введите описание");
                     setDescription(scanner.nextLine());
-                    SubTask subTask = new SubTask(name, getDescription(), getParentName(), getId(name,
+                    SubTask subTask = new SubTask(name, getDescription(), String.valueOf(getParentName().hashCode()), getId(name,
                             getParentName()), getStatus());
                     epicTasks.get(getParentName()).getSubTasks().add(subTask);
                     inMemoryHistoryManager.add(subTask);
@@ -348,21 +353,35 @@ public class InMemoryTaskManager implements TaskManager  {
         }
 
     @Override
-    public void getAllTasks() {
+    public ArrayList<String> getAllTasks(boolean isShortToString) {
+        String toCheckIfEmpty;
+        ArrayList<String> tasksString = new ArrayList<>();
         boolean isEmpty = true;
         if (tasks.size() > 0) {
-            System.out.println("Обычные задачи: ");
+           tasksString.add("Обычные задачи: \n");
             isEmpty = false;
             for (Task task : tasks.values())
-                System.out.println(task.toString());
+                if (isShortToString)
+                    tasksString.add(task.toStringCSV());
+                else tasksString.add(task.toString());
         }
         if (epicTasks.size() > 0) {
-            System.out.println("Крупные задачи: ");
+            tasksString.add("Крупные задачи: \n");
             isEmpty = false;
-            System.out.println(epicTasks + "\n");
+            for (EpicTask task : epicTasks.values()) {
+                if (isShortToString) {
+                    toCheckIfEmpty = task.toStringCSV();
+                    if (!toCheckIfEmpty.equals(""))
+                        tasksString.add(toCheckIfEmpty);
+                }
+                else tasksString.add(task.toString());
+            }
 
         }
-        if (isEmpty) System.out.println("Задач нет");
+        if (isEmpty) {
+            System.out.println("Задач нет");
+        }
+        return tasksString;
     }
 
     @Override
@@ -401,6 +420,10 @@ public class InMemoryTaskManager implements TaskManager  {
         return inMemoryHistoryManager.getHistory();
     }
 
+    public void addHistory(Task task){
+        inMemoryHistoryManager.add(task);
+    }
+
     @Override
     public String convertStatusType(int statusInput) {
         while (true) {
@@ -416,24 +439,45 @@ public class InMemoryTaskManager implements TaskManager  {
         }
     }
 
-    public void generateTaskForTest(String name) {
-        type = 1;
-        description = "test";
+    public HashMap<String, EpicTask> getEpicTasks() {
+        return epicTasks;
+    }
+
+    public HashMap<String, Task> getTasks() {
+        return tasks;
+    }
+
+    public void generateTask1(String name, String description, String status) {
         tasks.put(name, new Task(name, description, getIdForUsualTask(name), status));
     }
 
-    public void generateSubTaskForTest(String name, String parentId) {
-        type = 3;
+    public void generateSubTask1(String name,String description,String status, String parentId,boolean isNew) {
 
-        description = "test";
-
-        if (epicTasks.size() > 0)
-            epicTasks.get(parentId).getSubTasks().add(new SubTask(name, description, parentId, getId(name, parentId), status));
+        if (epicTasks.size() > 0) {
+            SubTask subTask = new SubTask(name,
+                    description,
+                    parentId,
+                    getId(name, parentId),
+                    status);
+            for (EpicTask epic : epicTasks.values()) {
+                String a1 = subTask.getParentName();
+                int a2 = subTask.getParentId(parentId);
+                int a3 = subTask.getParentId(parentName);
+                if (isNew){
+                    if (epic.getId() == subTask.getParentId(parentId)) {
+                        epic.getSubTasks().add(subTask);
+                        }
+                } else {
+                    if (epic.getId() == Integer.parseInt(subTask.getParentName())) {
+                        epic.getSubTasks().add(subTask);
+                    }
+                }
+            }
+        }
     }
 
-    public void generateEpicTaskForTest(String name) {
-        type = 2;
-        description = "333";
-        epicTasks.put(name, new EpicTask(name, description, getId(name)));
+    public void generateEpicTask1(String name,String description,String status) {
+        epicTasks.put(name, new EpicTask(name, description, getId(name),status));
     }
+
 }
