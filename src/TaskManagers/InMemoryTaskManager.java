@@ -85,7 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (SubTask subTask : epicTask.getSubTasks())
                 if (subTask.getId()==task2.getId()) {
                     System.out.print(counter + ") ");
-                    System.out.println(epicTask.toStringCSV());
+                    //System.out.println(epicTask.toStringCSV());
                     System.out.println(subTask);
                     hasBeenFound = true;
                 }
@@ -454,22 +454,31 @@ public class InMemoryTaskManager implements TaskManager {
     public void generateSubTask1(String name,String description,String status, String parentId,boolean isNew) {
 
         if (epicTasks.size() > 0) {
-            SubTask subTask = new SubTask(name,
-                    description,
-                    parentId,
-                    getId(name, parentId),
-                    status);
+            SubTask subTask;
             for (EpicTask epic : epicTasks.values()) {
-                String a1 = subTask.getParentName();
-                int a2 = subTask.getParentId(parentId);
-                int a3 = subTask.getParentId(parentName);
                 if (isNew){
-                    if (epic.getId() == subTask.getParentId(parentId)) {
+                    subTask = new SubTask(name,
+                            description,
+                            parentId,
+                            getId(name,parentId),
+                            status);
+                    if (epic.getId() == getId(parentId)) {
                         epic.getSubTasks().add(subTask);
                         }
                 } else {
-                    if (epic.getId() == Integer.parseInt(subTask.getParentName())) {
-                        epic.getSubTasks().add(subTask);
+                    String tempName = "";
+                    for (EpicTask epicTask : epicTasks.values())
+                        if (epicTask.getId()==Integer.parseInt(parentId))
+                            tempName = epicTask.getName();
+                    subTask = new SubTask(name,
+                            description,
+                            parentId,
+                            getId(name,tempName),
+                            status);
+                    int a4 = getId(tempName);
+                    int a5 = epic.getId();
+                    if (epic.getId() == getId(tempName)) {
+                            epic.getSubTasks().add(subTask);
                     }
                 }
             }

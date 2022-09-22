@@ -14,7 +14,7 @@ public class Main {
         try {fileBackedTasksManager.computeLoadedFile(fileBackedTasksManager.loadFromFile());}
         catch (Exception ignored) {
         }
-        final boolean IS_TEST_RUN_NEEDED = false;
+        final boolean IS_TEST_RUN_NEEDED = true;
         testRun(fileBackedTasksManager,IS_TEST_RUN_NEEDED); // <-----------------------------------Автоматическое создание
         //---------------------------------------------------------------------------задач по параметрам, см конец Main
 

@@ -7,4 +7,3 @@ id,type,name,status,description,epic
 1034272,subTask,1,NEW,description,1032753;
 1034303,subTask,2,NEW,description,1032753;
 1034334,subTask,3,NEW,description,1032753;
-

@@ -36,7 +36,7 @@ public class SubTask extends Task {
                 "," + getName() +
                 "," + getStatus() +
                 "," + getDescription() +
-                ","  + getParentId(getParentName()) +
+                ","  + parentName +
                 ";\n";
     }
 

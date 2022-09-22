@@ -1,7 +1,7 @@
 package TaskManagers;
 
 import CustomExceptions.ManagerSaveException;
-import HistoryManagers.InMemoryHistoryManager;
+import Enums.Statuses;
 import ManagersCreator.Managers;
 import Tasks.EpicTask;
 import Tasks.SubTask;
@@ -11,9 +11,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager{
     private String status = "NEW";
@@ -21,9 +21,70 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private int type;
     private final HashMap<String, EpicTask> epicTasks;
     private final HashMap<String, Task> tasks;
-    InMemoryHistoryManager inMemoryHistoryManager;
-    InMemoryTaskManager inMemoryTaskManager;
+    ArrayList<String> stringToSave;
+    static InMemoryTaskManager inMemoryTaskManager;
     private static final String FILE_NAME = "Tasks.txt";
+
+
+    static final boolean IS_TEST_RUN_NEEDED = true;
+    static final boolean IS_TASK_GENERATION_NEEDED = false;
+
+    public static void main(String[] args) {
+        if (IS_TEST_RUN_NEEDED) {
+            inMemoryTaskManager = (InMemoryTaskManager) Managers.getDefault(1);
+            FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
+            try {
+                fileBackedTasksManager.computeLoadedFile(loadFromFile());
+            } catch (Exception ignored) {
+            }
+            if (IS_TASK_GENERATION_NEEDED) {
+                fileBackedTasksManager.generateEpicTask("АБВ", "description", String.valueOf(Statuses.NEW));  //создание эпик задачи для тестов с именем АБВ
+                fileBackedTasksManager.generateEpicTask("АБВГ", "description", String.valueOf(Statuses.NEW));
+                fileBackedTasksManager.generateSubTask("3", "description", String.valueOf(Statuses.NEW), "АБВГ", true);
+                fileBackedTasksManager.generateSubTask("1", "description", String.valueOf(Statuses.NEW), "АБВ", true);//создание подзадачи для тестов с именем 1 у эпик задачи АБВ
+                fileBackedTasksManager.generateSubTask("2", "description", String.valueOf(Statuses.NEW), "АБВ", true);
+                fileBackedTasksManager.generateSubTask("3", "description", String.valueOf(Statuses.NEW), "АБВ", true);
+                fileBackedTasksManager.generateTask("ААА", "description", String.valueOf(Statuses.NEW)); //создание обычных задач
+                fileBackedTasksManager.generateTask("ЬЬЬ", "description", String.valueOf(Statuses.NEW));
+            }
+            ArrayList<String> tasks = fileBackedTasksManager.getAllTasks(false);
+            if(tasks.size()==0)
+                System.out.println("Задач нет");
+            else
+                System.out.println("Загружены задачи: ");
+            try {
+                fileBackedTasksManager.taskToStringBeforeSave(tasks,false);
+            } catch (ManagerSaveException ignored) {
+            }
+            if(inMemoryTaskManager.getHistory().isEmpty())
+                System.out.println("Истории нет");
+            else
+                System.out.println("Загружена история: ");
+            System.out.println("Поиск задачи с именем 3 в истории");
+            fileBackedTasksManager.findAll("3",true);
+            ArrayList<Task> memory = fileBackedTasksManager.getHistory();
+            int counter = 1;
+            for (Task task : memory) {
+                if(!fileBackedTasksManager.findById(task,counter))
+                    counter--;
+                counter++;
+            }
+            System.out.println("Сохранить новую историю? 1 - да; 2 - нет");
+            Scanner scanner = new Scanner(System.in);
+            String name = "1";//scanner.next();
+            if (name.equals("1")) {
+                tasks = fileBackedTasksManager.getAllTasks(true);
+                try{
+                    fileBackedTasksManager.taskToStringBeforeSave(tasks,true);
+                } catch (ManagerSaveException e) {
+                    System.out.println("Ошибка при сохранении");
+                }
+                System.out.println("Задачи и история сохранены, тестовая программа завершена");
+            } else {
+                System.out.println("Тестовая программа завершена");
+            }
+        }
+    }
 
     public FileBackedTasksManager () {
         tasks = new HashMap<>();
@@ -161,7 +222,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void taskToStringBeforeSave(ArrayList<String> taskList, boolean isToSave) throws ManagerSaveException {
         if(!isToSave)
             System.out.println(taskList);
-        ArrayList<String> stringToSave = new ArrayList<>();
+        stringToSave = new ArrayList<>();
         stringToSave.add ("id,type,name,status,description,epic\n");
         for (String task : taskList) {
             if (!task.equals("Обычные задачи: \n")
@@ -192,17 +253,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     int parentId = 0;
                     EpicTask foundParentforSubTask;
                     for (EpicTask epicTask1 : inMemoryTaskManager.getEpicTasks().values()) {
-                        if (epicTask1.getId() == inMemoryTaskManager.getId(task.getName(), task.getParentName()) || epicTasks.size() == 0) {
+                        if (epicTask1.getId() == Integer.parseInt(task.getParentName())) {
                             foundParentforSubTask = epicTask1;
                             parentId = foundParentforSubTask.getId();
-                            stringBuilder.append(foundParentforSubTask.getId() + ",");
-                            stringBuilder.append(foundParentforSubTask.getTaskType() + ",");
-                            stringBuilder.append(foundParentforSubTask.getName() + ",");
-                            stringBuilder.append(foundParentforSubTask.getStatus() + ",");
-                            stringBuilder.append(foundParentforSubTask.getDescription() + ";\n");
-                            stringToSave.add(stringBuilder.toString());
-                            stringBuilder = new StringBuilder();
-                            break;
                         }
                     }
                     stringBuilder.append(task.getId() + ",");
@@ -216,22 +269,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     break;
             }
         }
-
         if(isToSave) {
             try {
-                save(stringToSave);
+                save();
             } catch (IOException e) {
                 throw new ManagerSaveException(e);
             }
         }
-    }
-
-    public void save(ArrayList<String> tasks) throws IOException {
-        FileWriter fileWriter = new FileWriter(FILE_NAME);
-        for (String string : tasks){
-            fileWriter.append(string);
-        }
-        fileWriter.close();
     }
 
     static public String loadFromFile() throws Exception {
@@ -298,11 +342,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                                 loadedFromFile.get(5),
                                 Integer.parseInt(loadedFromFile.get(0)),
                                 loadedFromFile.get(3));
-                        for (EpicTask epicTask : epicTasks.values()){
+                        /*for (EpicTask epicTask : epicTasks.values()){
                             if (epicTask.getId()==subTask.getParentId(loadedFromFile.get(5))){
                                 inMemoryTaskManager.addHistory(epicTask);
                             }
-                        }
+                        }*/
                         inMemoryTaskManager.addHistory(subTask);
                         break;
                     case ("epicTask"):
@@ -323,7 +367,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             }
             loadedFromFile.clear();
         }
+    }
 
-
+    public void save() throws IOException {
+        FileWriter fileWriter = new FileWriter(FILE_NAME);
+        for (String string : stringToSave){
+            fileWriter.append(string);
+        }
+        fileWriter.close();
     }
 }
