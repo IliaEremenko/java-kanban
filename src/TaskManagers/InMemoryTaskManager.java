@@ -7,6 +7,7 @@ import Tasks.SubTask;
 import HistoryManagers.InMemoryHistoryManager;
 import ManagersCreator.Managers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -449,11 +450,13 @@ public class InMemoryTaskManager implements TaskManager {
         return tasks;
     }
 
-    public void generateTask1(String name, String description, String status) {
+    @Override
+    public void generateTask(String name, String description, String status) {
         tasks.put(name, new Task(name, description, getIdForUsualTask(name), status));
     }
 
-    public void generateSubTask1(String name,String description,String status, String parentId,boolean isNew) {
+    @Override
+    public void generateSubTask(String name,String description,String status, String parentId,boolean isNew) {
 
         if (epicTasks.size() > 0) {
             SubTask subTask;
@@ -485,8 +488,12 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void generateEpicTask1(String name,String description,String status) {
+    @Override
+    public void generateEpicTask(String name,String description,String status) {
         epicTasks.put(name, new EpicTask(name, description, getId(name),status));
+    }
+    @Override
+    public void save() throws IOException{
     }
 
 }

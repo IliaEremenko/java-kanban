@@ -207,17 +207,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public String convertStatusType(int statusInput) {
         return inMemoryTaskManager.convertStatusType(statusInput);
     }
-
+    @Override
     public void generateTask(String name, String description, String status) {
-        inMemoryTaskManager.generateTask1(name,description,status);
+        inMemoryTaskManager.generateTask(name,description,status);
     }
-
+    @Override
     public void generateSubTask(String name,String description,String status,String parentId,boolean isNew) {
-        inMemoryTaskManager.generateSubTask1(name,description,status,parentId,isNew);
+        inMemoryTaskManager.generateSubTask(name,description,status,parentId,isNew);
     }
-
+    @Override
     public void generateEpicTask(String name,String description,String status) {
-        inMemoryTaskManager.generateEpicTask1(name,description,status);
+        inMemoryTaskManager.generateEpicTask(name,description,status);
     }
 
     public void taskToStringBeforeSave(ArrayList<String> taskList, boolean isToSave) throws ManagerSaveException {
@@ -338,17 +338,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             if (!isHistory){
                 switch (loadedFromFile.get(1)){
                     case ("epicTask"):
-                        inMemoryTaskManager.generateEpicTask1(loadedFromFile.get(2),
+                        inMemoryTaskManager.generateEpicTask(loadedFromFile.get(2),
                                 loadedFromFile.get(4),
                                 loadedFromFile.get(3));
                         break;
                     case ("task"):
-                        inMemoryTaskManager.generateTask1(loadedFromFile.get(2),
+                        inMemoryTaskManager.generateTask(loadedFromFile.get(2),
                                 loadedFromFile.get(4),
                                 loadedFromFile.get(3));
                         break;
                     case ("subTask"):
-                        inMemoryTaskManager.generateSubTask1(loadedFromFile.get(2),
+                        inMemoryTaskManager.generateSubTask(loadedFromFile.get(2),
                                 loadedFromFile.get(4),
                                 loadedFromFile.get(3),
                                 loadedFromFile.get(5),
@@ -392,6 +392,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
+    @Override
     public void save() throws IOException {
         FileWriter fileWriter = new FileWriter(FILE_NAME);
         for (String string : stringToSave){

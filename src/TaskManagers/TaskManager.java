@@ -1,7 +1,10 @@
 package TaskManagers;
 
+import Tasks.EpicTask;
+import Tasks.SubTask;
 import Tasks.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,8 +40,16 @@ public interface TaskManager {
 
     int getId(String name, String parentId);
 
+    void generateTask(String name, String description, String status);
+
+    void generateSubTask(String name,String description,String status, String parentId,boolean isNew);
+
+    void generateEpicTask(String name,String description,String status);
+
     String convertStatusType(int statusInput);
 
     ArrayList<Task> getHistory();
+
+    void save() throws IOException;
 
 }
