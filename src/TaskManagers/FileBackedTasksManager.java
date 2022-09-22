@@ -293,8 +293,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         if(isToSave) {
             try {
                 save();
-            } catch (IOException e) {
-                throw new ManagerSaveException(e);
+            } catch (ManagerSaveException e) {
+                System.out.println("Ошибка записи: "+e);
             }
         }
     }
@@ -393,11 +393,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void save() throws IOException {
-        FileWriter fileWriter = new FileWriter(FILE_NAME);
-        for (String string : stringToSave){
-            fileWriter.append(string);
+    public void save() throws ManagerSaveException {
+
+        try {FileWriter fileWriter = new FileWriter(FILE_NAME);
+            for (String string : stringToSave){
+                fileWriter.append(string);
+            }
+        fileWriter.close();} catch (IOException e) {
+            throw new ManagerSaveException(e);
         }
-        fileWriter.close();
+
     }
 }

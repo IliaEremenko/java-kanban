@@ -1,5 +1,6 @@
 package TaskManagers;
 
+import CustomExceptions.ManagerSaveException;
 import Tasks.EpicTask;
 import Tasks.SubTask;
 import Tasks.Task;
@@ -50,6 +51,6 @@ public interface TaskManager {
 
     ArrayList<Task> getHistory();
 
-    void save() throws IOException;
+    void save() throws IOException, ManagerSaveException;
 
 }

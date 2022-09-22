@@ -1,5 +1,6 @@
 package TaskManagers;
 
+import CustomExceptions.ManagerSaveException;
 import Enums.Statuses;
 import Tasks.Task;
 import Tasks.EpicTask;
@@ -493,7 +494,7 @@ public class InMemoryTaskManager implements TaskManager {
         epicTasks.put(name, new EpicTask(name, description, getId(name),status));
     }
     @Override
-    public void save() throws IOException{
+    public void save() throws IOException, ManagerSaveException {
     }
 
 }
