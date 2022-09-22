@@ -11,9 +11,12 @@ public class Main {
 
     public static void main(String[] args) {
         FileBackedTasksManager fileBackedTasksManager = (FileBackedTasksManager) Managers.getDefault(2);
-        try {fileBackedTasksManager.computeLoadedFile(fileBackedTasksManager.loadFromFile());}
-        catch (Exception ignored) {
-        }
+        try {
+            try {
+                fileBackedTasksManager.computeLoadedFile(FileBackedTasksManager.loadFromFile());
+            } catch (java.lang.NumberFormatException ignored) {
+            }
+        }catch (java.lang.Exception ignored){}
         final boolean IS_TEST_RUN_NEEDED = true;
         testRun(fileBackedTasksManager,IS_TEST_RUN_NEEDED); // <-----------------------------------Автоматическое создание
         //---------------------------------------------------------------------------задач по параметрам, см конец Main

@@ -156,8 +156,10 @@ public class InMemoryTaskManager implements TaskManager {
                     System.out.println(epicTask.toStringShort());
                     System.out.println(subTask);
                     hasBeenFound = true;
-                    if(isForHistory)
+                    if(isForHistory) {
+                        inMemoryHistoryManager.add(epicTask);
                         inMemoryHistoryManager.add(subTask);
+                    }
                 }
         }
         if (!hasBeenFound)
@@ -459,7 +461,7 @@ public class InMemoryTaskManager implements TaskManager {
                 if (isNew){
                     subTask = new SubTask(name,
                             description,
-                            parentId,
+                            String.valueOf(getId(parentId)),
                             getId(name,parentId),
                             status);
                     if (epic.getId() == getId(parentId)) {
@@ -475,8 +477,6 @@ public class InMemoryTaskManager implements TaskManager {
                             parentId,
                             getId(name,tempName),
                             status);
-                    int a4 = getId(tempName);
-                    int a5 = epic.getId();
                     if (epic.getId() == getId(tempName)) {
                             epic.getSubTasks().add(subTask);
                     }

@@ -35,7 +35,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager();
             try {
                 fileBackedTasksManager.computeLoadedFile(loadFromFile());
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                System.out.println(e);
             }
             if (IS_TASK_GENERATION_NEEDED) {
                 fileBackedTasksManager.generateEpicTask("АБВ", "description", String.valueOf(Statuses.NEW));  //создание эпик задачи для тестов с именем АБВ
@@ -59,19 +60,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             if(inMemoryTaskManager.getHistory().isEmpty())
                 System.out.println("Истории нет");
             else
-                System.out.println("Загружена история: ");
-            System.out.println("Поиск задачи с именем 3 в истории");
-            fileBackedTasksManager.findAll("3",true);
+                System.out.println("История загружена");
             ArrayList<Task> memory = fileBackedTasksManager.getHistory();
+
             int counter = 1;
             for (Task task : memory) {
                 if(!fileBackedTasksManager.findById(task,counter))
                     counter--;
                 counter++;
             }
+            fileBackedTasksManager.findAll("3",true);
             System.out.println("Сохранить новую историю? 1 - да; 2 - нет");
             Scanner scanner = new Scanner(System.in);
-            String name = "1";//scanner.next();
+            String name = scanner.next();
             if (name.equals("1")) {
                 tasks = fileBackedTasksManager.getAllTasks(true);
                 try{
@@ -237,6 +238,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         stringToSave.add("\n");
         ArrayList<Task> historyList = getHistory();
         StringBuilder stringBuilder = new StringBuilder();
+        int lastEpicId = 0;
         for (Task task : historyList){
             switch (task.getTaskType()){
                 case "epicTask":
@@ -248,22 +250,41 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                     stringBuilder.append(task.getDescription() + ";\n");
                     stringToSave.add(stringBuilder.toString());
                     stringBuilder = new StringBuilder();
+                    lastEpicId = task.getId();
                     break;
                 case "subTask":
+                    int parsedNameInt = 0;
                     int parentId = 0;
                     EpicTask foundParentforSubTask;
                     for (EpicTask epicTask1 : inMemoryTaskManager.getEpicTasks().values()) {
-                        if (epicTask1.getId() == Integer.parseInt(task.getParentName())) {
+                        try {parsedNameInt = Integer.parseInt(task.getParentName());} catch (NumberFormatException e) {
+                            parsedNameInt = getId(task.getName(),task.getParentName());
+                        }
+                        if (epicTask1.getId() ==  parsedNameInt ) {
                             foundParentforSubTask = epicTask1;
                             parentId = foundParentforSubTask.getId();
+                            if (lastEpicId != foundParentforSubTask.getId()) {
+                                stringBuilder.append(foundParentforSubTask.getId() + ",");
+                                stringBuilder.append(foundParentforSubTask.getTaskType() + ",");
+                                stringBuilder.append(foundParentforSubTask.getName() + ",");
+                                stringBuilder.append(foundParentforSubTask.getStatus() + ",");
+                                stringBuilder.append(foundParentforSubTask.getDescription() + ";\n");
+                                stringToSave.add(stringBuilder.toString());
+                                stringBuilder = new StringBuilder();
+                            }
                         }
                     }
+                    int temp = 0;
+                    try {temp = parentId;} catch (NumberFormatException e) {
+                        parentId = getId(task.getName(),String.valueOf(parentId));
+                    }
+
                     stringBuilder.append(task.getId() + ",");
                     stringBuilder.append(task.getTaskType() + ",");
                     stringBuilder.append(task.getName() + ",");
                     stringBuilder.append(task.getStatus() + ",");
                     stringBuilder.append(task.getDescription() + ",");
-                    stringBuilder.append(parentId + ";\n");
+                    stringBuilder.append(parsedNameInt + ";\n");
                     stringToSave.add(stringBuilder.toString());
                     stringBuilder = new StringBuilder();
                     break;
@@ -302,7 +323,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         stringBuilder.replace(0,37,"");
         tempString = stringBuilder.toString();
         sprintArrayToSplitTasks = tempString.split(";");
+        int i = 0;
         for (String tempString1 : sprintArrayToSplitTasks){
+            i++;
             sprintArrayToSplitOneTask = tempString1.split(",");
             for (String tempString2 : sprintArrayToSplitOneTask) {
                 loadedFromFile.add(tempString2);
@@ -342,11 +365,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                                 loadedFromFile.get(5),
                                 Integer.parseInt(loadedFromFile.get(0)),
                                 loadedFromFile.get(3));
-                        /*for (EpicTask epicTask : epicTasks.values()){
+                        for (EpicTask epicTask : epicTasks.values()){
                             if (epicTask.getId()==subTask.getParentId(loadedFromFile.get(5))){
                                 inMemoryTaskManager.addHistory(epicTask);
                             }
-                        }*/
+                        }
                         inMemoryTaskManager.addHistory(subTask);
                         break;
                     case ("epicTask"):
