@@ -22,8 +22,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private final HashMap<String, EpicTask> epicTasks;
     private final HashMap<String, Task> tasks;
     ArrayList<String> stringToSave;
+    ArrayList<String> tasksToSave;
     static InMemoryTaskManager inMemoryTaskManager;
     private static final String FILE_NAME = "Tasks.txt";
+
 
 
     static final boolean IS_TEST_RUN_NEEDED = true;
@@ -53,37 +55,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 System.out.println("Задач нет");
             else
                 System.out.println("Загружены задачи: ");
-            try {
-                fileBackedTasksManager.taskToStringBeforeSave(tasks, false);
-            } catch (ManagerSaveException ignored) {
-            }
+            fileBackedTasksManager.printTasks();
             if (inMemoryTaskManager.getHistory().isEmpty())
                 System.out.println("Истории нет");
             else
                 System.out.println("История загружена");
             ArrayList<Task> memory = fileBackedTasksManager.getHistory();
-
             int counter = 1;
             for (Task task : memory) {
                 if (!fileBackedTasksManager.findById(task, counter))
                     counter--;
                 counter++;
             }
+            System.out.println("Поиск задачи с именем 3 в списке задач: ");
             fileBackedTasksManager.findAll("3", true);
-            System.out.println("Сохранить новую историю? 1 - да; 2 - нет");
-            Scanner scanner = new Scanner(System.in);
-            String name = scanner.next();
-            if (name.equals("1")) {
-                tasks = fileBackedTasksManager.getAllTasks(true);
-                try {
-                    fileBackedTasksManager.taskToStringBeforeSave(tasks, true);
-                } catch (ManagerSaveException e) {
-                    System.out.println("Ошибка при сохранении");
-                }
-                System.out.println("Задачи и история сохранены, тестовая программа завершена");
-            } else {
-                System.out.println("Тестовая программа завершена");
-            }
+            System.out.println("Данные сохранены, тестовая программа завершена");
         }
     }
 
@@ -135,7 +121,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     @Override
     public boolean findAll(String name, boolean isForHistory) {
-        return inMemoryTaskManager.findAll(name, isForHistory);
+        boolean temp = inMemoryTaskManager.findAll(name, isForHistory);
+        if(isForHistory)
+            save();
+        return temp;
+
     }
 
     @Override
@@ -156,26 +146,31 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     @Override
     public void deleteByName() {
         inMemoryTaskManager.deleteByName();
+        save();
     }
 
     @Override
     public void deleteAllTasks() {
         inMemoryTaskManager.deleteAllTasks();
+        save();
     }
 
     @Override
     public void addTask() {
         inMemoryTaskManager.addTask();
+        save();
     }
 
     @Override
     public void updateTask() {
         inMemoryTaskManager.updateTask();
+        save();
     }
 
     @Override
     public void addOrUpdateTask(boolean isNew) {
         inMemoryTaskManager.addOrUpdateTask(isNew);
+        save();
     }
 
     @Override
@@ -223,83 +218,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         inMemoryTaskManager.generateEpicTask(name, description, status);
     }
 
-    public void taskToStringBeforeSave(ArrayList<String> taskList, boolean isToSave) throws ManagerSaveException {
-        if (!isToSave)
-            System.out.println(taskList);
-        stringToSave = new ArrayList<>();
-        stringToSave.add("id,type,name,status,description,epic\n");
-        for (String task : taskList) {
-            if (!task.equals("Обычные задачи: \n")
-                    && !task.equals("Крупные задачи: \n")
-            ) {
-                task = task.replace("[", "");
-                task = task.replace("]", "");
-                task = task.replace(";\n, ", ";\n");
-                stringToSave.add(task);
-            }
-        }
-        stringToSave.add("\n");
-        ArrayList<Task> historyList = getHistory();
-        StringBuilder stringBuilder = new StringBuilder();
-        int lastEpicId = 0;
-        for (Task task : historyList) {
-            switch (task.getTaskType()) {
-                case "epicTask":
-                case "task":
-                    stringBuilder.append(task.getId() + ",");
-                    stringBuilder.append(task.getTaskType() + ",");
-                    stringBuilder.append(task.getName() + ",");
-                    stringBuilder.append(task.getStatus() + ",");
-                    stringBuilder.append(task.getDescription() + ";\n");
-                    stringToSave.add(stringBuilder.toString());
-                    stringBuilder = new StringBuilder();
-                    lastEpicId = task.getId();
-                    break;
-                case "subTask":
-                    int parsedNameInt = 0;
-                    int parentId = 0;
-                    EpicTask foundParentforSubTask;
-                    for (EpicTask epicTask1 : inMemoryTaskManager.getEpicTasks().values()) {
-                        try {
-                            parsedNameInt = Integer.parseInt(task.getParentName());
-                        } catch (NumberFormatException e) {
-                            parsedNameInt = getId(task.getName(), task.getParentName());
-                        }
-                        if (epicTask1.getId() == parsedNameInt) {
-                            foundParentforSubTask = epicTask1;
-                            parentId = foundParentforSubTask.getId();
-                            if (lastEpicId != foundParentforSubTask.getId()) {
-                                stringBuilder.append(foundParentforSubTask.getId() + ",");
-                                stringBuilder.append(foundParentforSubTask.getTaskType() + ",");
-                                stringBuilder.append(foundParentforSubTask.getName() + ",");
-                                stringBuilder.append(foundParentforSubTask.getStatus() + ",");
-                                stringBuilder.append(foundParentforSubTask.getDescription() + ";\n");
-                                stringToSave.add(stringBuilder.toString());
-                                stringBuilder = new StringBuilder();
-                            }
-                        }
-                    }
-                    int temp = 0;
-                    try {
-                        temp = parentId;
-                    } catch (NumberFormatException e) {
-                        parentId = getId(task.getName(), String.valueOf(parentId));
-                    }
-
-                    stringBuilder.append(task.getId() + ",");
-                    stringBuilder.append(task.getTaskType() + ",");
-                    stringBuilder.append(task.getName() + ",");
-                    stringBuilder.append(task.getStatus() + ",");
-                    stringBuilder.append(task.getDescription() + ",");
-                    stringBuilder.append(parsedNameInt + ";\n");
-                    stringToSave.add(stringBuilder.toString());
-                    stringBuilder = new StringBuilder();
-                    break;
-            }
-        }
-        if (isToSave) {
-            save();
-        }
+    public void printTasks(){
+        System.out.println(getAllTasks(false));
     }
 
     static public String loadFromFile() throws Exception {
@@ -395,8 +315,79 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
-    @Override
     public void save() {
+        ArrayList<String> tasksToSave = getAllTasks(true);
+        stringToSave = new ArrayList<>();
+        stringToSave.add("id,type,name,status,description,epic\n");
+        for (String task : tasksToSave) {
+            if (!task.equals("Обычные задачи: \n")
+                    && !task.equals("Крупные задачи: \n")
+            ) {
+                task = task.replace("[", "");
+                task = task.replace("]", "");
+                task = task.replace(";\n, ", ";\n");
+                stringToSave.add(task);
+            }
+        }
+        stringToSave.add("\n");
+        ArrayList<Task> historyList = getHistory();
+        StringBuilder stringBuilder = new StringBuilder();
+        int lastEpicId = 0;
+        for (Task task : historyList) {
+            switch (task.getTaskType()) {
+                case "epicTask":
+                case "task":
+                    stringBuilder.append(task.getId() + ",");
+                    stringBuilder.append(task.getTaskType() + ",");
+                    stringBuilder.append(task.getName() + ",");
+                    stringBuilder.append(task.getStatus() + ",");
+                    stringBuilder.append(task.getDescription() + ";\n");
+                    stringToSave.add(stringBuilder.toString());
+                    stringBuilder = new StringBuilder();
+                    lastEpicId = task.getId();
+                    break;
+                case "subTask":
+                    int parsedNameInt = 0;
+                    int parentId = 0;
+                    EpicTask foundParentforSubTask;
+                    for (EpicTask epicTask1 : inMemoryTaskManager.getEpicTasks().values()) {
+                        try {
+                            parsedNameInt = Integer.parseInt(task.getParentName());
+                        } catch (NumberFormatException e) {
+                            parsedNameInt = getId(task.getName(), task.getParentName());
+                        }
+                        if (epicTask1.getId() == parsedNameInt) {
+                            foundParentforSubTask = epicTask1;
+                            parentId = foundParentforSubTask.getId();
+                            if (lastEpicId != foundParentforSubTask.getId()) {
+                                stringBuilder.append(foundParentforSubTask.getId() + ",");
+                                stringBuilder.append(foundParentforSubTask.getTaskType() + ",");
+                                stringBuilder.append(foundParentforSubTask.getName() + ",");
+                                stringBuilder.append(foundParentforSubTask.getStatus() + ",");
+                                stringBuilder.append(foundParentforSubTask.getDescription() + ";\n");
+                                stringToSave.add(stringBuilder.toString());
+                                stringBuilder = new StringBuilder();
+                            }
+                        }
+                    }
+                    int temp = 0;
+                    try {
+                        temp = parentId;
+                    } catch (NumberFormatException e) {
+                        parentId = getId(task.getName(), String.valueOf(parentId));
+                    }
+
+                    stringBuilder.append(task.getId() + ",");
+                    stringBuilder.append(task.getTaskType() + ",");
+                    stringBuilder.append(task.getName() + ",");
+                    stringBuilder.append(task.getStatus() + ",");
+                    stringBuilder.append(task.getDescription() + ",");
+                    stringBuilder.append(parsedNameInt + ";\n");
+                    stringToSave.add(stringBuilder.toString());
+                    stringBuilder = new StringBuilder();
+                    break;
+            }
+        }
         try {
             try {
                 FileWriter fileWriter = new FileWriter(FILE_NAME);

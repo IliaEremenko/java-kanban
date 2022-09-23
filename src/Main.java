@@ -16,26 +16,21 @@ public class Main {
                 fileBackedTasksManager.computeLoadedFile(FileBackedTasksManager.loadFromFile());
             } catch (java.lang.NumberFormatException ignored) {
             }
-        }catch (java.lang.Exception ignored){}
+        } catch (java.lang.Exception ignored) {
+        }
         final boolean IS_TEST_RUN_NEEDED = true;
-        testRun(fileBackedTasksManager,IS_TEST_RUN_NEEDED); // <-----------------------------------Автоматическое создание
+        testRun(fileBackedTasksManager, IS_TEST_RUN_NEEDED); // <-----------------------------------Автоматическое создание
         //---------------------------------------------------------------------------задач по параметрам, см конец Main
 
         loop:
         while (true) {
-
-            ArrayList<String> tasks = fileBackedTasksManager.getAllTasks(false);
             printMenu();
             Scanner scanner = new Scanner(System.in);
             int command = scanner.nextInt();
             fileBackedTasksManager.checkStatus();
             switch (command) {
                 case (1):
-                    try {
-                        fileBackedTasksManager.taskToStringBeforeSave(tasks,false);
-                    } catch (ManagerSaveException e) {
-                        System.out.println("Ошибка при сохранении");
-                    }
+                    fileBackedTasksManager.printTasks();
                     break;
                 case (2):
                     fileBackedTasksManager.deleteAllTasks();
@@ -43,7 +38,7 @@ public class Main {
                 case (3):
                     System.out.println("Введите имя");
                     String name = scanner.next();
-                    fileBackedTasksManager.findAll(name,true);
+                    fileBackedTasksManager.findAll(name, true);
                     break;
                 case (4):
                     fileBackedTasksManager.addTask();
@@ -58,21 +53,15 @@ public class Main {
                     ArrayList<Task> memory = fileBackedTasksManager.getHistory();
                     int counter = 1;
                     for (Task task : memory) {
-                        if(!fileBackedTasksManager.findById(task,counter))
+                        if (!fileBackedTasksManager.findById(task, counter))
                             counter--;
                         counter++;
                     }
-                    if(counter==1)
+                    if (counter == 1)
                         System.out.println("История пуста");
-                    break ;
+                    break;
                 case (8):
-                    tasks = fileBackedTasksManager.getAllTasks(true);
-                    try{
-                    fileBackedTasksManager.taskToStringBeforeSave(tasks,true);
-                    } catch (ManagerSaveException e) {
-                        System.out.println("Ошибка при сохранении");
-                    }
-
+                    fileBackedTasksManager.save();
                     break loop;
                /* case (9):
                     tasks = fileBackedTasksManager.getAllTasks(true);;
@@ -89,7 +78,7 @@ public class Main {
         System.out.println("5 - Обновить задачу");
         System.out.println("6 - удалить по имени");
         System.out.println("7 - история просмотров");
-        System.out.println("8 - сохранить и выйти");
+        System.out.println("8 - выход");
     }
 
     public static void testRun(FileBackedTasksManager taskManager, boolean testRun) {
